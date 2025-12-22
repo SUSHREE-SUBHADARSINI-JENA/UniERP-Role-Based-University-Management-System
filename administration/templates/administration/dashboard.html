@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block sidebar %}
+<h6 class="text-muted">ADMIN PANEL</h6>
+<ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin_students' %}">Students</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin_teachers' %}">Teachers</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin_departments' %}">Departments</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin_courses' %}">Courses</a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+<p>University-level administration panel</p>
+{% endblock %}
