@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+{% block content %}
+
+<h3>Mark Attendance</h3>
+
+<form method="get">
+    <select name="course" onchange="this.form.submit()" class="form-control w-50">
+        <option value="">Select Course</option>
+        {% for c in courses %}
+            <option value="{{ c.id }}" {% if selected_course == c.id|stringformat:"s" %}selected{% endif %}>
+                {{ c.name }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+{% if students %}
+<form method="post" class="mt-4">
+    {% csrf_token %}
+    <input type="hidden" name="course" value="{{ selected_course }}">
+
+    <table class="table table-bordered">
+        <tr>
+            <th>Student</th>
+            <th>Present</th>
+        </tr>
+
+        {% for s in students %}
+        <tr>
+            <td>{{ s.student.username }}</td>
+            <td>
+                <input type="checkbox" name="student_{{ s.student.id }}">
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <button class="btn btn-success">Submit Attendance</button>
+</form>
+{% endif %}
+
+{% endblock %}

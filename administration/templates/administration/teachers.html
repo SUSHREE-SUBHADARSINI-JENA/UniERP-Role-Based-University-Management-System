@@ -1,6 +1,19 @@
-{% extends 'base/base.html' %}
+<h2>Teacher List</h2>
+<a href="{% url 'add_teacher' %}">Add Teacher</a>
 
-{% block content %}
-<h3>Manage Teachers</h3>
-<p>Add, update, and remove students here.</p>
-{% endblock %}
+<table border="1" cellpadding="7">
+    <tr>
+        <th>Name</th><th>Email</th><th>Phone</th>
+        <th>Department</th><th>Joining Date</th>
+    </tr>
+
+    {% for t in teachers %}
+    <tr>
+        <td>{{ t.name }}</td>
+        <td>{{ t.email }}</td>
+        <td>{{ t.phone }}</td>
+        <td>{{ t.department }}</td>
+        <td>{{ t.joining_date }}</td>
+    </tr>
+    {% endfor %}
+</table>

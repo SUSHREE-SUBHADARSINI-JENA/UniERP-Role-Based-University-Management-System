@@ -1,6 +1,49 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-<h3>Manage Students</h3>
-<p>Add, update, and remove students here.</p>
+<h3>Student Enrollment</h3>
+
+<form method="post" class="mb-4">
+    {% csrf_token %}
+    <div class="row g-2">
+        <div class="col">
+            <select name="student" class="form-control" required>
+                <option value="">Select Student</option>
+                {% for student in students %}
+                    <option value="{{ student.id }}">{{ student.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col">
+            <select name="course" class="form-control" required>
+                <option value="">Select Course</option>
+                {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col">
+            <button class="btn btn-primary">Enroll</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Student</th>
+        <th>Course</th>
+    </tr>
+    {% for e in enrollments %}
+    <tr>
+        <td>{{ e.student.username }}</td>
+        <td>{{ e.course.name }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="2">No enrollments yet</td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}

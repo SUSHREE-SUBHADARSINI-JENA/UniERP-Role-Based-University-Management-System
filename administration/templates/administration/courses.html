@@ -1,6 +1,56 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-<h3>Manage Courses</h3>
-<p>Add, update, and remove students here.</p>
+<h3>Courses</h3>
+
+<form method="post" class="mb-4">
+    {% csrf_token %}
+    <div class="row g-2">
+        <div class="col">
+            <input type="text" name="name" class="form-control" placeholder="Course name" required>
+        </div>
+
+        <div class="col">
+            <select name="department" class="form-control" required>
+                <option value="">Select Department</option>
+                {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col">
+            <select name="teacher" class="form-control">
+                <option value="">Assign Teacher (optional)</option>
+                {% for teacher in teachers %}
+                    <option value="{{ teacher.id }}">{{ teacher.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col">
+            <button class="btn btn-primary">Add Course</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Teacher</th>
+    </tr>
+
+    {% for course in courses %}
+    <tr>
+        <td>{{ course.name }}</td>
+        <td>{{ course.department.name }}</td>
+        <td>{{ course.teacher.username|default:"Not Assigned" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3">No courses added yet</td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}
