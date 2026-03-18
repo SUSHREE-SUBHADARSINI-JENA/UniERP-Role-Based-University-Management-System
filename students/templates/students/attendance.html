@@ -1,0 +1,54 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Attendance | Student Portal{% endblock %}
+{% block header_title %}My Attendance Records{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+        <h2 class="font-semibold text-gray-800">Attendance History</h2>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider">
+                    <th class="px-6 py-4 font-medium">Date</th>
+                    <th class="px-6 py-4 font-medium">Course</th>
+                    <th class="px-6 py-4 font-medium text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for record in records %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 text-gray-800 font-medium">
+                        {{ record.date|date:"F d, Y" }}
+                    </td>
+                    <td class="px-6 py-4 text-gray-600">
+                        {{ record.course.name }}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        {% if record.present %}
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                            <i class="fa-solid fa-check-circle"></i> Present
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                            <i class="fa-solid fa-times-circle"></i> Absent
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="px-6 py-12 text-center text-gray-500">
+                        <i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-gray-300"></i>
+                        <p>No attendance records found yet.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

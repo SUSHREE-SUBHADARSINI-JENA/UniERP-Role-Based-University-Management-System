@@ -1,69 +1,140 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Teacher
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import role_required
+from django.contrib import messages
 from django.contrib.auth.models import User
-
-def is_admin(user):
-    return user.is_superuser
-
-@login_required
-@user_passes_test(is_admin)
-def teachers_list(request):
-    teachers = Teacher.objects.all()
-    return render(request, 'teachers/teachers_list.html', {'teachers': teachers})
-
+from administration.models import Course, Attendance
+from .models import Assignment, Grade, QuestionPaper
 
 @login_required
-@user_passes_test(is_admin)
-def add_teacher(request):
-    if request.method == 'POST':
-        user = User.objects.create_user(
-            username=request.POST['username'],
-            password=request.POST['password'],
-            first_name=request.POST['first_name'],
-            last_name=request.POST['last_name'],
-            email=request.POST['email']
-        )
-
-        Teacher.objects.create(
-            user=user,
-            employee_id=request.POST['employee_id'],
-            department=request.POST['department'],
-            phone=request.POST['phone']
-        )
-        return redirect('teachers')
-
-    return render(request, 'teachers/add_teacher.html')
-
-@login_required
+@role_required('teacher')
 def teacher_dashboard(request):
-    return render(request, 'teachers/dashboard.html')
-
-@login_required
-def mark_attendance(request):
-    return render(request, 'teachers/attendance.html')
-
-@login_required
-@user_passes_test(is_admin)
-def edit_teacher(request, id):
-    teacher = Teacher.objects.get(id=id)
-    if request.method == 'POST':
-        teacher.user.first_name = request.POST['first_name']
-        teacher.user.last_name = request.POST['last_name']
-        teacher.user.email = request.POST['email']
-        teacher.user.save()
-
-        teacher.employee_id = request.POST['employee_id']
-        teacher.department = request.POST['department']
-        teacher.phone = request.POST['phone']
-        teacher.save()
-        return redirect('teachers')
+    courses = Course.objects.filter(teacher=request.user)
     
-    return render(request, 'teachers/edit_teacher.html', {'teacher': teacher})
+    total_students = User.objects.filter(profile__role='student').count()
+    total_assignments = Assignment.objects.filter(course__in=courses).count()
+    total_materials = QuestionPaper.objects.filter(course__in=courses).count()
+
+    context = {
+        'courses': courses,
+        'total_students': total_students,
+        'total_assignments': total_assignments,
+        'total_materials': total_materials
+    }
+    return render(request, 'teachers/dashboard.html', context)
 
 @login_required
-@user_passes_test(is_admin)
-def delete_teacher(request, id):
-    teacher = Teacher.objects.get(id=id)
-    teacher.user.delete()
-    return redirect('teachers')
+@role_required('teacher')
+def mark_attendance(request):
+    courses = Course.objects.filter(teacher=request.user)
+    students = User.objects.filter(profile__role='student')
+    
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        date = request.POST.get('date')
+        
+        if course_id and date:
+            course = Course.objects.get(id=course_id)
+            for student in students:
+                status = request.POST.get(f'status_{student.id}')
+                is_present = (status == 'present')
+                Attendance.objects.update_or_create(
+                    student=student,
+                    course=course,
+                    date=date,
+                    defaults={'present': is_present}
+                )
+            messages.success(request, 'Attendance marked successfully.')
+            return redirect('mark_attendance')
+
+    return render(request, 'teachers/attendance.html', {
+        'courses': courses,
+        'students': students
+    })
+
+@login_required
+@role_required('teacher')
+def manage_assignments(request):
+    courses = Course.objects.filter(teacher=request.user)
+    assignments = Assignment.objects.filter(course__in=courses).order_by('-created_at')
+    
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        due_date = request.POST.get('due_date')
+        
+        if course_id and title and due_date:
+            course = Course.objects.get(id=course_id)
+            Assignment.objects.create(
+                course=course,
+                title=title,
+                description=description,
+                due_date=due_date
+            )
+            messages.success(request, 'Assignment added successfully.')
+            return redirect('manage_assignments')
+
+    return render(request, 'teachers/assignments.html', {
+        'courses': courses,
+        'assignments': assignments
+    })
+
+@login_required
+@role_required('teacher')
+def manage_grades(request):
+    courses = Course.objects.filter(teacher=request.user)
+    students = User.objects.filter(profile__role='student')
+    grades = Grade.objects.filter(course__in=courses).order_by('course', 'exam_name', 'student__username')
+    
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        student_id = request.POST.get('student_id')
+        exam_name = request.POST.get('exam_name')
+        marks_obtained = request.POST.get('marks_obtained')
+        total_marks = request.POST.get('total_marks')
+        
+        if course_id and student_id and exam_name and marks_obtained and total_marks:
+            course = Course.objects.get(id=course_id)
+            student = User.objects.get(id=student_id)
+            Grade.objects.create(
+                course=course,
+                student=student,
+                exam_name=exam_name,
+                marks_obtained=marks_obtained,
+                total_marks=total_marks
+            )
+            messages.success(request, 'Grade added successfully.')
+            return redirect('manage_grades')
+
+    return render(request, 'teachers/grades.html', {
+        'courses': courses,
+        'students': students,
+        'grades': grades
+    })
+
+@login_required
+@role_required('teacher')
+def manage_questions(request):
+    courses = Course.objects.filter(teacher=request.user)
+    materials = QuestionPaper.objects.filter(course__in=courses).order_by('-uploaded_at')
+    
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        title = request.POST.get('title')
+        file = request.FILES.get('file')
+        
+        if course_id and title and file:
+            course = Course.objects.get(id=course_id)
+            QuestionPaper.objects.create(
+                course=course,
+                title=title,
+                file=file
+            )
+            messages.success(request, 'Material uploaded successfully.')
+            return redirect('manage_questions')
+
+    return render(request, 'teachers/questions.html', {
+        'courses': courses,
+        'materials': materials
+    })

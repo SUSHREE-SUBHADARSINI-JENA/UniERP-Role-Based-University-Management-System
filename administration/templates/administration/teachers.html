@@ -1,19 +1,139 @@
-<h2>Teacher List</h2>
-<a href="{% url 'add_teacher' %}">Add Teacher</a>
+{% extends 'base/base.html' %}
 
-<table border="1" cellpadding="7">
-    <tr>
-        <th>Name</th><th>Email</th><th>Phone</th>
-        <th>Department</th><th>Joining Date</th>
-    </tr>
+{% block title %}Manage Teachers - Admin{% endblock %}
 
-    {% for t in teachers %}
-    <tr>
-        <td>{{ t.name }}</td>
-        <td>{{ t.email }}</td>
-        <td>{{ t.phone }}</td>
-        <td>{{ t.department }}</td>
-        <td>{{ t.joining_date }}</td>
-    </tr>
-    {% endfor %}
-</table>
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Teacher Directory</h1>
+        <p class="text-slate-500 mt-1">Manage all faculty members across departments.</p>
+    </div>
+    <div class="mt-4 md:mt-0">
+        <button id="addTeacherBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition flex items-center">
+            <i class="fa-solid fa-user-plus mr-2"></i> Add Teacher
+        </button>
+    </div>
+</div>
+
+<!-- Add Teacher Modal -->
+<div id="addTeacherModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 overflow-hidden transform transition-all">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+            <h3 class="font-semibold text-slate-800 text-lg"><i class="fa-solid fa-user-plus text-indigo-600 mr-2"></i>Register New Teacher</h3>
+            <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <form method="post" action="{% url 'admin_teachers' %}" class="space-y-4">
+                {% csrf_token %}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                        <input type="text" name="first_name" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                        <input type="text" name="last_name" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                    <input type="text" name="username" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                    <input type="email" name="email" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" name="password" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                    <button type="button" id="cancelModalBtn" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition">Cancel</button>
+                    <button type="submit" name="add_teacher" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition shadow-sm">Created Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="font-semibold text-slate-800"><i class="fa-solid fa-users text-indigo-600 mr-2"></i>All Teachers</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
+                    <th class="px-6 py-4 font-medium">Teacher</th>
+                    <th class="px-6 py-4 font-medium">Username</th>
+                    <th class="px-6 py-4 font-medium">Email</th>
+                    <th class="px-6 py-4 font-medium">Role</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for t in teachers %}
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-6 py-4 text-slate-800 font-medium">
+                        <div class="flex items-center">
+                            <div class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3 text-xs">
+                                {{ t.first_name|make_list|first|default:t.username|make_list|first|upper }}
+                            </div>
+                            {{ t.first_name }} {{ t.last_name }}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-600">
+                        <span class="font-mono text-xs bg-slate-100 px-2 py-1 rounded">{{ t.username }}</span>
+                    </td>
+                    <td class="px-6 py-4 text-slate-600">{{ t.email|default:"N/A" }}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            Teacher
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-6 py-8 text-center text-slate-500">
+                        <div class="flex flex-col items-center">
+                            <i class="fa-solid fa-users-slash text-4xl mb-3 text-slate-300"></i>
+                            <p>No teachers have been added yet.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('addTeacherModal');
+    const openBtn = document.getElementById('addTeacherBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const cancelBtn = document.getElementById('cancelModalBtn');
+
+    openBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+    });
+
+    const closeModal = () => {
+        modal.classList.add('hidden');
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    // Close when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

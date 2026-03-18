@@ -1,0 +1,44 @@
+{% extends 'students/base.html' %}
+
+{% block title %}My Courses | Student Portal{% endblock %}
+{% block header_title %}My Enrolled Courses{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for enrollment in enrollments %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
+        <div class="h-3 bg-green-500"></div>
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-bold text-gray-800">{{ enrollment.course.name }}</h3>
+                <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-medium">{{ enrollment.course.department.name|default:"General" }}</span>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+                <div class="flex items-center text-sm text-gray-600">
+                    <i class="fa-solid fa-chalkboard-user w-6 text-gray-400"></i>
+                    <span>Prof. {{ enrollment.course.teacher.get_full_name|default:enrollment.course.teacher.username|default:"Not Assigned" }}</span>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-100 pt-4 flex gap-2">
+                <a href="{% url 'student_assignments' %}" class="flex-1 text-center py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 text-sm font-medium transition">
+                    <i class="fa-solid fa-tasks mr-1"></i> Tasks
+                </a>
+                <a href="{% url 'student_materials' %}" class="flex-1 text-center py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 text-sm font-medium transition">
+                    <i class="fa-solid fa-folder-open mr-1"></i> Files
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full bg-white rounded-xl border border-gray-200 p-12 text-center">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+            <i class="fa-solid fa-book-open text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-800 mb-1">Not Enrolled Yet</h3>
+        <p class="text-gray-500">You haven't been enrolled in any courses for the current semester.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

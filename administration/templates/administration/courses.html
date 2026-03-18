@@ -1,56 +1,103 @@
 {% extends 'base/base.html' %}
 
+{% block title %}Manage Courses - Admin{% endblock %}
+
 {% block content %}
-<h3>Courses</h3>
-
-<form method="post" class="mb-4">
-    {% csrf_token %}
-    <div class="row g-2">
-        <div class="col">
-            <input type="text" name="name" class="form-control" placeholder="Course name" required>
-        </div>
-
-        <div class="col">
-            <select name="department" class="form-control" required>
-                <option value="">Select Department</option>
-                {% for dept in departments %}
-                    <option value="{{ dept.id }}">{{ dept.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="col">
-            <select name="teacher" class="form-control">
-                <option value="">Assign Teacher (optional)</option>
-                {% for teacher in teachers %}
-                    <option value="{{ teacher.id }}">{{ teacher.username }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="col">
-            <button class="btn btn-primary">Add Course</button>
-        </div>
+<div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Course Management</h1>
+        <p class="text-slate-500 mt-1">Create and manage university courses.</p>
     </div>
-</form>
+</div>
 
-<table class="table table-bordered">
-    <tr>
-        <th>Name</th>
-        <th>Department</th>
-        <th>Teacher</th>
-    </tr>
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+        <h3 class="font-semibold text-slate-800"><i class="fa-solid fa-plus text-indigo-600 mr-2"></i>Add New Course</h3>
+    </div>
+    <div class="p-6">
+        <form method="post" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            {% csrf_token %}
+            <div class="col-span-1">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Course Name</label>
+                <input type="text" name="name" class="w-full border border-slate-300 rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent placeholder-slate-400" placeholder="e.g. Data Structures" required>
+            </div>
+            
+            <div class="col-span-1">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Department</label>
+                <select name="department" class="w-full border border-slate-300 rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent" required>
+                    <option value="">Select Department...</option>
+                    {% for d in departments %}
+                        <option value="{{ d.id }}">{{ d.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-    {% for course in courses %}
-    <tr>
-        <td>{{ course.name }}</td>
-        <td>{{ course.department.name }}</td>
-        <td>{{ course.teacher.username|default:"Not Assigned" }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="3">No courses added yet</td>
-    </tr>
-    {% endfor %}
-</table>
+            <div class="col-span-1">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Assign Teacher (Optional)</label>
+                <select name="teacher" class="w-full border border-slate-300 rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent">
+                    <option value="">--- Unassigned ---</option>
+                    {% for t in teachers %}
+                        <option value="{{ t.id }}">{{ t.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-span-1">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg transition shadow-sm">
+                    Create Course
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="font-semibold text-slate-800"><i class="fa-solid fa-layer-group text-indigo-600 mr-2"></i>Course Directory</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
+                    <th class="px-6 py-4 font-medium">Course Name</th>
+                    <th class="px-6 py-4 font-medium">Department</th>
+                    <th class="px-6 py-4 font-medium">Assigned Teacher</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for c in courses %}
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-6 py-4 text-slate-800 font-semibold">{{ c.name }}</td>
+                    <td class="px-6 py-4 text-slate-600">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {{ c.department.name }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if c.teacher %}
+                            <div class="flex items-center text-slate-700">
+                                <i class="fa-solid fa-chalkboard-user text-slate-400 mr-2"></i>
+                                {{ c.teacher.username }}
+                            </div>
+                        {% else %}
+                            <span class="text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Unassigned
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="px-6 py-8 text-center text-slate-500">
+                        <div class="flex flex-col items-center">
+                            <i class="fa-regular fa-folder-open text-4xl mb-3 text-slate-300"></i>
+                            <p>No courses available.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
