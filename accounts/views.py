@@ -13,3 +13,7 @@ def dashboard_redirect(request):
         return redirect('student_dashboard')
 
     return redirect('login')
+
+
+def no_permission(request):
+    return render(request, 'base/no_permission.html')

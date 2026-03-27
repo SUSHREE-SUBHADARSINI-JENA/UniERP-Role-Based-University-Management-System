@@ -1,0 +1,76 @@
+{% extends 'teachers/base.html' %}
+
+{% block title %}Dashboard - Teacher{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800">Teacher Dashboard</h1>
+    <p class="text-slate-500 mt-1">Overview of your courses and activities.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center">
+        <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-full flex items-center justify-center text-2xl mr-4">
+            <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">My Courses</p>
+            <h3 class="text-2xl font-bold text-slate-800">{{ courses.count|default:'0' }}</h3>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center">
+        <div class="bg-emerald-100 text-emerald-600 w-14 h-14 rounded-full flex items-center justify-center text-2xl mr-4">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Students</p>
+            <h3 class="text-2xl font-bold text-slate-800">{{ total_students|default:'0' }}</h3>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center">
+        <div class="bg-amber-100 text-amber-600 w-14 h-14 rounded-full flex items-center justify-center text-2xl mr-4">
+            <i class="fa-solid fa-tasks"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Assignments</p>
+            <h3 class="text-2xl font-bold text-slate-800">{{ total_assignments|default:'0' }}</h3>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center">
+        <div class="bg-blue-100 text-blue-600 w-14 h-14 rounded-full flex items-center justify-center text-2xl mr-4">
+            <i class="fa-solid fa-file-alt"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Materials</p>
+            <h3 class="text-2xl font-bold text-slate-800">{{ total_materials|default:'0' }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h3 class="font-semibold text-slate-800">My Courses</h3>
+        </div>
+        <div class="p-6">
+            {% if courses %}
+            <ul class="divide-y divide-slate-100">
+                {% for course in courses %}
+                <li class="py-3 flex justify-between items-center">
+                    <div>
+                        <p class="font-medium text-slate-800">{{ course.name }}</p>
+                        <p class="text-sm text-slate-500">{{ course.department.name }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-slate-500">No courses assigned to you yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,42 +1,96 @@
-{% extends 'base/base.html' %}
+{% extends 'teachers/base.html' %}
+{% block title %}Mark Attendance | Teacher Portal{% endblock %}
+
 {% block content %}
+<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Mark Attendance</h1>
+        <p class="text-gray-500 text-sm mt-1">Record attendance for your enrolled students</p>
+    </div>
+</div>
 
-<h3>Mark Attendance</h3>
-
-<form method="get">
-    <select name="course" onchange="this.form.submit()" class="form-control w-50">
-        <option value="">Select Course</option>
-        {% for c in courses %}
-            <option value="{{ c.id }}" {% if selected_course == c.id|stringformat:"s" %}selected{% endif %}>
-                {{ c.name }}
-            </option>
-        {% endfor %}
-    </select>
-</form>
-
-{% if students %}
-<form method="post" class="mt-4">
-    {% csrf_token %}
-    <input type="hidden" name="course" value="{{ selected_course }}">
-
-    <table class="table table-bordered">
-        <tr>
-            <th>Student</th>
-            <th>Present</th>
-        </tr>
-
-        {% for s in students %}
-        <tr>
-            <td>{{ s.student.username }}</td>
-            <td>
-                <input type="checkbox" name="student_{{ s.student.id }}">
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <button class="btn btn-success">Submit Attendance</button>
-</form>
+{% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 rounded-md bg-green-50 p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fa-solid fa-check-circle text-green-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium text-green-800">{{ message }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 {% endif %}
 
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+    <div class="p-6 border-b border-gray-100">
+        <form method="get" class="flex flex-col sm:flex-row items-center gap-4">
+            <label for="courseSelect" class="font-semibold text-gray-700 whitespace-nowrap">Select Course:</label>
+            <select id="courseSelect" name="course" onchange="this.form.submit()" class="block w-full sm:max-w-md rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border">
+                <option value="">-- Choose a Course --</option>
+                {% for c in courses %}
+                    <option value="{{ c.id }}" {% if selected_course == c.id|stringformat:"s" %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if students %}
+    <div class="p-6 bg-gray-50">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="course_id" value="{{ selected_course }}">
+
+            <div class="mb-6 flex flex-col sm:flex-row items-center gap-4">
+                <label for="dateSelect" class="font-semibold text-gray-700 whitespace-nowrap">Date:</label>
+                <input type="date" id="dateSelect" name="date" required class="block w-full sm:max-w-xs rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border">
+            </div>
+
+            <div class="bg-white border rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200 text-left">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2">Student</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2">Present</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for s in students %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ s.username }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <input type="checkbox" name="student_{{ s.id }}" class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-6 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full sm:w-auto">
+                    Submit Attendance
+                </button>
+            </div>
+        </form>
+    </div>
+    {% elif selected_course %}
+    <div class="p-6">
+        <div class="rounded-md bg-blue-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-info-circle text-blue-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-blue-800">No students are currently enrolled in this course.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

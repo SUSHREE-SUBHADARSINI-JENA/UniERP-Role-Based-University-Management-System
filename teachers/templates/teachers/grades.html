@@ -1,0 +1,151 @@
+{% extends 'teachers/base.html' %}
+{% block title %}Manage Grades | Teacher Portal{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Manage Grades</h1>
+        <p class="text-gray-500 text-sm mt-1">Publish grades for your students</p>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 rounded-md bg-green-50 p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fa-solid fa-check-circle text-green-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium text-green-800">{{ message }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+    <div class="p-6 border-b border-gray-100">
+        <form method="get" class="flex flex-col sm:flex-row items-center gap-4">
+            <label for="courseSelect" class="font-semibold text-gray-700 whitespace-nowrap">Select Course:</label>
+            <select id="courseSelect" name="course" onchange="this.form.submit()" class="block w-full sm:max-w-md rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border">
+                <option value="">-- Choose a Course --</option>
+                {% for c in courses %}
+                    <option value="{{ c.id }}" {% if selected_course == c.id|stringformat:"s" %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if students %}
+    <div class="flex flex-col lg:flex-row p-6 gap-6 bg-gray-50">
+        <!-- Add Grade Form -->
+        <div class="lg:w-1/3">
+            <div class="bg-white rounded-lg shadow border border-gray-200">
+                <div class="px-4 py-3 border-b border-gray-200 bg-indigo-50">
+                    <h4 class="font-semibold text-indigo-800">Add New Grade</h4>
+                </div>
+                <div class="p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="course_id" value="{{ selected_course }}">
+
+                        <div class="mb-4">
+                            <label for="student_id" class="block text-sm font-medium text-gray-700 mb-1">Student</label>
+                            <select name="student_id" id="student_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" required>
+                                <option value="">-- Select Student --</option>
+                                {% for s in students %}
+                                    <option value="{{ s.id }}">{{ s.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="exam_name" class="block text-sm font-medium text-gray-700 mb-1">Exam Name</label>
+                            <input type="text" name="exam_name" id="exam_name" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" placeholder="e.g. Midterm 1" required>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label for="marks_obtained" class="block text-sm font-medium text-gray-700 mb-1">Marks</label>
+                                <input type="number" step="0.01" name="marks_obtained" id="marks_obtained" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" required>
+                            </div>
+                            <div>
+                                <label for="total_marks" class="block text-sm font-medium text-gray-700 mb-1">Total</label>
+                                <input type="number" step="0.01" name="total_marks" id="total_marks" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Publish Grade
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing Grades Map -->
+        <div class="lg:w-2/3">
+            <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                    <h4 class="font-semibold text-gray-800">Existing Grades</h4>
+                </div>
+                <div class="overflow-x-auto max-h-96">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100 sticky top-0">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exam</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for grade in grades %}
+                            {% if grade.course.id|stringformat:"s" == selected_course %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ grade.student.username }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ grade.exam_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">{{ grade.marks_obtained }} / {{ grade.total_marks }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% widthratio grade.marks_obtained grade.total_marks 100 as percentage %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if percentage|add:0 >= 80 %}bg-green-100 text-green-800
+                                        {% elif percentage|add:0 >= 50 %}bg-blue-100 text-blue-800
+                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ percentage|default:"0" }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
+                                    No grades published for this course yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif selected_course %}
+    <div class="p-6">
+        <div class="rounded-md bg-blue-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-info-circle text-blue-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-blue-800">No students are currently enrolled in this course.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
