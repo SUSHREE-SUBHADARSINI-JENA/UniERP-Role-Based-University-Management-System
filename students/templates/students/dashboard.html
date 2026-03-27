@@ -1,0 +1,120 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Dashboard | Student Portal{% endblock %}
+{% block header_title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Stat Card 1 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Enrolled Courses</p>
+                <p class="text-2xl font-bold text-gray-800">{{ total_courses }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                <i class="fa-solid fa-book-open text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Card 2 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Pending Assignments</p>
+                <p class="text-2xl font-bold text-gray-800">{{ recent_assignments.count }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
+                <i class="fa-solid fa-clock text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Card 3 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Attendance</p>
+                <p class="text-2xl font-bold text-gray-800">{{ attendance_percentage }}%</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                <i class="fa-solid fa-clipboard-check text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Card 4 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Recent Grades</p>
+                <p class="text-2xl font-bold text-gray-800">{{ recent_grades.count }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+                <i class="fa-solid fa-award text-xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Recent Assignments -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+            <h2 class="font-semibold text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-thumbtack text-amber-500"></i> Upcoming Assignments
+            </h2>
+            <a href="{% url 'student_assignments' %}" class="text-sm text-green-600 hover:text-green-700 font-medium">View All &rarr;</a>
+        </div>
+        <div class="divide-y divide-gray-100">
+            {% for assignment in recent_assignments %}
+            <div class="p-4 hover:bg-gray-50 transition flex items-center justify-between">
+                <div>
+                    <h3 class="font-medium text-gray-800">{{ assignment.title }}</h3>
+                    <p class="text-sm text-gray-500">{{ assignment.course.name }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-amber-600">Due: {{ assignment.due_date|date:"M d, Y" }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-8 text-center text-gray-500">
+                <i class="fa-regular fa-face-smile-beam text-3xl mb-2 text-gray-300"></i>
+                <p>No upcoming assignments.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Grades -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+            <h2 class="font-semibold text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap text-purple-500"></i> Recent Grades
+            </h2>
+            <a href="{% url 'student_grades' %}" class="text-sm text-green-600 hover:text-green-700 font-medium">View All &rarr;</a>
+        </div>
+        <div class="divide-y divide-gray-100">
+            {% for grade in recent_grades %}
+            <div class="p-4 hover:bg-gray-50 transition flex items-center justify-between">
+                <div>
+                    <h3 class="font-medium text-gray-800">{{ grade.exam_name }}</h3>
+                    <p class="text-sm text-gray-500">{{ grade.course.name }}</p>
+                </div>
+                <div class="text-right">
+                    <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                        {{ grade.marks_obtained }} / {{ grade.total_marks }}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-8 text-center text-gray-500">
+                <i class="fa-solid fa-inbox text-3xl mb-2 text-gray-300"></i>
+                <p>No grades posted yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

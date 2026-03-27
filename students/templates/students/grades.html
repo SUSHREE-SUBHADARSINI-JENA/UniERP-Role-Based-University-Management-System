@@ -1,0 +1,33 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Grades | Student Portal{% endblock %}
+{% block header_title %}My Transcript & Grades{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for grade in grades %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition flex flex-col">
+        <div class="h-2 bg-purple-500"></div>
+        <div class="p-6 flex-1 flex flex-col">
+            <span class="text-xs font-bold tracking-wider text-purple-600 uppercase mb-2">{{ grade.course.name }}</span>
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ grade.exam_name }}</h3>
+            
+            <div class="mt-auto pt-6 flex items-end justify-between border-t border-gray-100">
+                <div class="text-sm text-gray-500">Score</div>
+                <div class="text-2xl font-bold {% if grade.marks_obtained|add:0 >= grade.total_marks|add:0|floatformat:2|add:"-10" %}text-green-600{% else %}text-gray-800{% endif %}">
+                    {{ grade.marks_obtained }} <span class="text-sm text-gray-400 font-normal">/ {{ grade.total_marks }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full bg-white rounded-xl border border-gray-200 p-12 text-center">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+            <i class="fa-solid fa-award text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-800 mb-1">No Grades Available</h3>
+        <p class="text-gray-500">Your teachers haven't uploaded any grades for you yet.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

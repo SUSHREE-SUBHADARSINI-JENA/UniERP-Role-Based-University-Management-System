@@ -1,0 +1,87 @@
+
+{% extends 'base/base.html' %}
+
+{% block title %}Add Teacher | University ERP{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%) !important;
+    }
+    .add-teacher-card {
+        border: none;
+        border-radius: 1.25rem;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        background: rgba(255,255,255,0.95);
+    }
+    .add-teacher-header {
+        background: linear-gradient(90deg, #6366f1 0%, #0ea5e9 100%);
+        border-top-left-radius: 1.25rem;
+        border-top-right-radius: 1.25rem;
+        color: #fff;
+        padding: 2rem 1rem 1rem 1rem;
+        text-align: center;
+        position: relative;
+    }
+    .add-teacher-header .icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .add-teacher-btn {
+        background: linear-gradient(90deg, #6366f1 0%, #0ea5e9 100%);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: 1px;
+        border-radius: 0.5rem;
+        transition: background 0.2s;
+    }
+    .add-teacher-btn:hover {
+        background: linear-gradient(90deg, #0ea5e9 0%, #6366f1 100%);
+        color: #fff;
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card add-teacher-card w-100" style="max-width: 480px;">
+        <div class="add-teacher-header">
+            <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+                  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM14 8a.5.5 0 0 1 .5.5V10h1.5a.5.5 0 0 1 0 1H14.5v1.5a.5.5 0 0 1-1 0V11H12a.5.5 0 0 1 0-1h1.5V8.5A.5.5 0 0 1 14 8z"/>
+                  <path d="M7 13c-2.33 0-7 1.17-7 3.5V16h14v-.5C14 14.17 9.33 13 7 13z"/>
+                </svg>
+            </span>
+            <h2 class="fw-bold mb-0">Add Teacher</h2>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="phone" name="phone" required>
+                </div>
+                <div class="mb-3">
+                    <label for="department" class="form-label">Department</label>
+                    <input type="text" class="form-control" id="department" name="department" required>
+                </div>
+                <div class="mb-3">
+                    <label for="joining_date" class="form-label">Joining Date</label>
+                    <input type="date" class="form-control" id="joining_date" name="joining_date" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn add-teacher-btn py-2">Add Teacher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

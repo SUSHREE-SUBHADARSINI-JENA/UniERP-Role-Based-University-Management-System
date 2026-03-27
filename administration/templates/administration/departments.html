@@ -1,15 +1,29 @@
 {% extends 'base/base.html' %}
 
-{% block content %}
-<h3>Departments</h3>
+{% block title %}Manage Departments - Admin{% endblock %}
 
-<form method="post" class="mb-3">
-    {% csrf_token %}
-    <div class="input-group">
-        <input type="text" name="name" class="form-control" placeholder="Department name" required>
-        <button class="btn btn-primary">Add</button>
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Departments</h1>
+        <p class="text-slate-500 mt-1">Manage university departments.</p>
     </div>
-</form>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8 max-w-2xl">
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="font-semibold text-slate-800"><i class="fa-solid fa-plus text-indigo-600 mr-2"></i>Add Department</h3>
+    </div>
+    <div class="p-6">
+        <form method="post" class="flex gap-3">
+            {% csrf_token %}
+            <input type="text" name="name" class="flex-1 border border-slate-300 rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent placeholder-slate-400" placeholder="Department name" required>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-6 rounded-lg transition shadow-sm whitespace-nowrap">
+                Add New
+            </button>
+        </form>
+    </div>
+</div>
 
 <table class="table table-bordered">
     <tr>
@@ -27,9 +41,8 @@
     </tr>
     {% empty %}
     <tr>
-        <td colspan="2">No department yet</td>
+        <td colspan="2">No departments yet</td>
     </tr>
     {% endfor %}
 </table>
 {% endblock %}
-
