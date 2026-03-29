@@ -47,6 +47,9 @@
                 <a href="{% url 'admin_courses' %}" class="sidebar-item hover:bg-slate-50 text-slate-600 flex items-center px-4 py-3 rounded-lg transition-colors {% if request.resolver_match.url_name == 'admin_courses' %}active{% endif %}">
                     <i class="fa-solid fa-book-open w-6"></i> Courses
                 </a>
+                <a href="{% url 'admin_defaulters' %}" class="sidebar-item hover:bg-slate-50 text-slate-600 flex items-center px-4 py-3 rounded-lg transition-colors {% if request.resolver_match.url_name == 'admin_defaulters' %}active{% endif %}">
+                    <i class="fa-solid fa-triangle-exclamation w-6"></i> Defaulter List
+                </a>
             </nav>
         </div>
 

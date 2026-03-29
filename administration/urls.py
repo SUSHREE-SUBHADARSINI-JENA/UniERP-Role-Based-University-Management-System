@@ -8,5 +8,6 @@ urlpatterns = [
     path('departments/', views.admin_departments, name='admin_departments'),
     path('departments/delete/<int:dept_id>/', views.delete_department, name='delete_department'),
     path('courses/', views.admin_courses, name='admin_courses'),
+    path('defaulters/', views.admin_defaulters, name='admin_defaulters'),
 ]
 
