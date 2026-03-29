@@ -50,8 +50,51 @@ def admin_teachers(request):
 @login_required
 @role_required('admin')
 def admin_students(request):
+    if request.method == 'POST':
+        if 'add_student' in request.POST:
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Username already exists.')
+            else:
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name
+                )
+                user.profile.role = 'student'
+                user.profile.save()
+                messages.success(request, 'Student created successfully.')
+            return redirect('admin_students')
+            
+        elif 'enroll_student' in request.POST:
+            student_id = request.POST.get('student')
+            course_id = request.POST.get('course')
+            if student_id and course_id:
+                student = User.objects.filter(id=student_id, profile__role='student').first()
+                course = Course.objects.filter(id=course_id).first()
+                if student and course:
+                    if Enrollment.objects.filter(student=student, course=course).exists():
+                        messages.error(request, 'Student is already enrolled in this course.')
+                    else:
+                        Enrollment.objects.create(student=student, course=course)
+                        messages.success(request, 'Student enrolled successfully.')
+            return redirect('admin_students')
+
     students = User.objects.filter(profile__role='student')
-    return render(request, 'administration/students.html', {'students': students})
+    courses = Course.objects.all()
+    enrollments = Enrollment.objects.all().order_by('-id')
+    return render(request, 'administration/students.html', {
+        'students': students,
+        'courses': courses,
+        'enrollments': enrollments
+    })
 
 @login_required
 @role_required('admin')
