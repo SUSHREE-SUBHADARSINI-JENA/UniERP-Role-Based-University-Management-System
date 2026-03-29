@@ -77,6 +77,7 @@ def student_grades(request):
         'grade_details': grade_details,
         'sgpa': sgpa_data['sgpa'],
         'total_courses': sgpa_data['grade_count'],
+        'total_credits': sgpa_data['grade_count'] * 3,
         'sgpa_interpretation': sgpa_data['interpretation'],
     }
     return render(request, 'students/grades.html', context)

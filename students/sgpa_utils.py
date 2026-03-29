@@ -122,6 +122,7 @@ def calculate_sgpa(grades_list, credits_list=None):
             'total_credits': 0,
             'grade_count': 0,
             'weighted_sum': 0.0,
+            'interpretation': get_sgpa_interpretation(0.0),
         }
     
     # Default credits per course if not provided

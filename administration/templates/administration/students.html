@@ -5,8 +5,60 @@
 {% block content %}
 <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">Student Enrollment</h1>
-        <p class="text-slate-500 mt-1">Enroll students into courses.</p>
+        <h1 class="text-2xl font-bold text-slate-800">Student Directory & Enrollment</h1>   
+        <p class="text-slate-500 mt-1">Manage students and enroll them into courses.</p>        
+    </div>
+    <div class="mt-4 md:mt-0">
+        <button id="addStudentBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition flex items-center">
+            <i class="fa-solid fa-user-plus mr-2"></i> Add Student
+        </button>
+    </div>
+</div>
+
+<!-- Add Student Modal -->
+<div id="addStudentModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 overflow-hidden transform transition-all">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+            <h3 class="font-semibold text-slate-800 text-lg"><i class="fa-solid fa-user-plus text-indigo-600 mr-2"></i>Register New Student</h3>
+            <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <form method="post" action="{% url 'admin_students' %}" class="space-y-4">
+                {% csrf_token %}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                        <input type="text" name="first_name" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                        <input type="text" name="last_name" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                    <input type="text" name="username" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                    <input type="email" name="email" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" name="password" class="w-full border border-slate-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                    <button type="button" id="cancelModalBtn" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition">Cancel</button>
+                    <button type="submit" name="add_student" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition shadow-sm">Create Account</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -15,7 +67,7 @@
         <h3 class="font-semibold text-slate-800"><i class="fa-solid fa-plus text-indigo-600 mr-2"></i>New Enrollment</h3>
     </div>
     <div class="p-6">
-        <form method="post" class="flex flex-col md:flex-row gap-4 items-end">
+        <form method="post" class="flex flex-col md:flex-row gap-4 items-end">  
             {% csrf_token %}
             <div class="w-full md:w-2/5">
                 <label class="block text-sm font-medium text-slate-700 mb-1">Student</label>
@@ -26,7 +78,7 @@
                     {% endfor %}
                 </select>
             </div>
-            
+
             <div class="w-full md:w-2/5">
                 <label class="block text-sm font-medium text-slate-700 mb-1">Course</label>
                 <select name="course" class="w-full border border-slate-300 rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent" required>
@@ -36,9 +88,9 @@
                     {% endfor %}
                 </select>
             </div>
-            
+
             <div class="w-full md:w-1/5">
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg transition shadow-sm">
+                <button type="submit" name="enroll_student" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg transition shadow-sm">      
                     Enroll Student
                 </button>
             </div>
@@ -55,7 +107,7 @@
             <thead>
                 <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
                     <th class="px-6 py-4 font-medium">Student Name</th>
-                    <th class="px-6 py-4 font-medium">Enrolled Course</th>
+                    <th class="px-6 py-4 font-medium">Enrolled Course</th>      
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -87,4 +139,32 @@
         </table>
     </div>
 </div>
+
+<script>
+    const modal = document.getElementById('addStudentModal');
+    const openBtn = document.getElementById('addStudentBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const cancelBtn = document.getElementById('cancelModalBtn');
+
+    if(openBtn) {
+        openBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+        });
+    }
+
+    const closeModal = () => {
+        if(modal) modal.classList.add('hidden');
+    }
+
+    if(closeBtn) closeBtn.addEventListener('click', closeModal);
+    if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    // Close when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+</script>
+
 {% endblock %}
